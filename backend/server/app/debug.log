@@ -1,0 +1,155 @@
+2025-03-08 15:44:05,586 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 15:44:05,586 - INFO - Processing request
+2025-03-08 15:49:33,753 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 15:49:33,754 - INFO - Processing file: image_0.jpg
+2025-03-08 15:49:33,796 - INFO - Image verified successfully
+2025-03-08 15:49:33,796 - INFO - Request processed successfully
+2025-03-08 15:52:48,176 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 15:52:48,176 - INFO - Processing file: image_0.jpg
+2025-03-08 15:52:48,187 - INFO - Image verified successfully
+2025-03-08 15:52:48,187 - INFO - Generating query embedding
+2025-03-08 15:52:48,939 - ERROR - Embedding generation error: name 'clip' is not defined
+Traceback (most recent call last):
+  File "B:\Project\smartsightv3-o\backend\server\app\routes.py", line 61, in upload_file
+    query_embedding = get_joint_embedding(image, query)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "B:\Project\smartsightv3-o\backend\server\app\utils.py", line 35, in get_joint_embedding
+    text_embedding = get_text_embedding(text)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "B:\Project\smartsightv3-o\backend\server\app\utils.py", line 28, in get_text_embedding
+    text_tokenized = clip.tokenize([text]).to("cuda" if torch.cuda.is_available() else "cpu")
+                     ^^^^
+NameError: name 'clip' is not defined
+2025-03-08 15:52:48,940 - ERROR - HTTP Exception: Embedding failed: name 'clip' is not defined
+2025-03-08 15:55:01,349 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 15:55:01,349 - INFO - Processing file: image_0.jpg
+2025-03-08 15:55:01,380 - INFO - Image verified successfully
+2025-03-08 15:55:01,381 - INFO - Generating query embedding
+2025-03-08 15:55:01,838 - INFO - Query embedding generated successfully
+2025-03-08 15:55:01,838 - INFO - Request processed successfully
+2025-03-08 16:00:40,631 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 16:00:40,633 - INFO - Processing file: image_0.jpg
+2025-03-08 16:00:40,669 - INFO - Image verified successfully
+2025-03-08 16:00:40,670 - INFO - Generating query embedding
+2025-03-08 16:00:41,475 - INFO - Query embedding generated successfully
+2025-03-08 16:00:41,475 - INFO - Searching FAISS index
+2025-03-08 16:00:41,484 - INFO - FAISS search results: [('..\\database\\images\\1.jpg', 'No caption found')]
+2025-03-08 16:00:41,484 - INFO - Copying ..\database\images\1.jpg to B:\Project\smartsightv3-o\backend\server\app\..\..\..\static/..\database\images\1.jpg
+2025-03-08 16:00:41,484 - WARNING - Image file ..\database\images\1.jpg not found: [Errno 2] No such file or directory: '..\\database\\images\\1.jpg'
+2025-03-08 16:00:41,489 - INFO - Retrieved Images: []
+2025-03-08 16:00:41,489 - INFO - Retrieved Captions: []
+2025-03-08 16:00:41,489 - INFO - Querying Gemini
+2025-03-08 16:00:45,839 - INFO - LLM Response: This is a very open-ended question. To give you a helpful answer, I need more information.  I need context about "this."  Please tell me:
+
+*   **What are you referring to when you say "this"?** Is it a place you saw in a picture, a place you're currently at, a place you're thinking about, etc.?
+*   **Do you have any other information about "this"?**  Any landmarks, cities, general location, or anything that can help me identify it?
+
+For example, you could say:
+
+*   "Where is this? (and then show me a picture)"
+*   "Where is this? I'm standing on a corner with a large bank building and a park across the street."
+*   "Where is this place I heard about called 'The Lost City of Z'?"
+
+The more information you provide, the better I can assist you.
+2025-03-08 16:00:45,839 - INFO - Request processed successfully
+2025-03-08 16:03:32,348 - INFO - Received request: file=image_0.jpg, query='wgere', session_id='default'
+2025-03-08 16:03:32,349 - INFO - Processing file: image_0.jpg
+2025-03-08 16:03:32,375 - INFO - Image verified successfully
+2025-03-08 16:03:32,376 - INFO - Generating query embedding
+2025-03-08 16:03:32,809 - INFO - Query embedding generated successfully
+2025-03-08 16:03:32,809 - INFO - Searching FAISS index
+2025-03-08 16:03:32,809 - INFO - FAISS search results: [('..\\database\\images\\2.jpg', 'No caption found')]
+2025-03-08 16:03:32,809 - INFO - Copying ..\database\images\2.jpg to B:\Project\smartsightv3-o\backend\server\app\..\..\..\static/..\database\images\2.jpg
+2025-03-08 16:03:32,809 - WARNING - Image file ..\database\images\2.jpg not found: [Errno 2] No such file or directory: '..\\database\\images\\2.jpg'
+2025-03-08 16:03:32,809 - INFO - Retrieved Images: []
+2025-03-08 16:03:32,809 - INFO - Retrieved Captions: []
+2025-03-08 16:03:32,809 - INFO - Querying Gemini
+2025-03-08 16:03:36,188 - INFO - LLM Response: This looks like a misspelling. Did you mean "where"? If so, I need more context to give you a helpful response. What are you trying to find out? For example:
+
+*   "Where is the nearest grocery store?"
+*   "Where did I leave my keys?"
+*   "Where can I find information about..."
+
+Please provide more information so I can assist you better.
+2025-03-08 16:03:36,188 - INFO - Request processed successfully
+2025-03-08 16:30:54,480 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 16:30:54,480 - INFO - Processing file: image_0.jpg
+2025-03-08 16:30:54,494 - INFO - Image verified successfully
+2025-03-08 16:30:54,495 - INFO - Generating query embedding
+2025-03-08 16:30:54,860 - INFO - Query embedding generated successfully
+2025-03-08 16:30:54,860 - INFO - Searching FAISS index
+2025-03-08 16:30:54,860 - INFO - FAISS search results: [('..\\database\\images\\1.jpg', 'No caption found')]
+2025-03-08 16:30:54,860 - INFO - Copying B:\Project\smartsightv3-o\backend\database\images\1.jpg to B:\Project\smartsightv3-o\backend\server\static\1.jpg
+2025-03-08 16:30:54,860 - INFO - Retrieved Images: ['http://localhost:8000/static/1.jpg']
+2025-03-08 16:30:54,860 - INFO - Retrieved Captions: ['No caption found']
+2025-03-08 16:30:54,860 - INFO - Querying Gemini
+2025-03-08 16:31:07,607 - ERROR - Gemini query error: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+Traceback (most recent call last):
+  File "B:\Project\smartsightv3-o\backend\server\app\routes.py", line 118, in upload_file
+    llm_response = query_gemini(query, retrieved_captions, session_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "B:\Project\smartsightv3-o\backend\server\app\memory.py", line 25, in query_gemini
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\langchain_core\load\serializable.py", line 125, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\pydantic\main.py", line 214, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\langchain_google_genai\chat_models.py", line 853, in validate_environment
+    self.client = genaix.build_generative_service(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\langchain_google_genai\_genai_extension.py", line 276, in build_generative_service
+    return v1betaGenerativeServiceClient(**config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 696, in __init__
+    self._transport = transport_init(
+                      ^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\transports\grpc.py", line 235, in __init__
+    super().__init__(
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\transports\base.py", line 100, in __init__
+    credentials, _ = google.auth.default(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vaish\anaconda3\envs\smartsight\Lib\site-packages\google\auth\_default.py", line 719, in default
+    raise exceptions.DefaultCredentialsError(_CLOUD_SDK_MISSING_CREDENTIALS)
+google.auth.exceptions.DefaultCredentialsError: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-03-08 16:31:07,613 - ERROR - HTTP Exception: Gemini query failed: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+2025-03-08 16:41:35,653 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 16:41:35,654 - INFO - Processing file: image_0.jpg
+2025-03-08 16:41:35,676 - INFO - Image verified successfully
+2025-03-08 16:41:35,677 - INFO - Generating query embedding
+2025-03-08 16:41:36,091 - INFO - Query embedding generated successfully
+2025-03-08 16:41:36,091 - INFO - Searching FAISS index
+2025-03-08 16:41:36,091 - INFO - FAISS search results: [('..\\database\\images\\7.jpg', 'No caption found')]
+2025-03-08 16:41:36,091 - INFO - Copying B:\Project\smartsightv3-o\backend\database\images\7.jpg to B:\Project\smartsightv3-o\backend\server\static\7.jpg
+2025-03-08 16:41:36,091 - INFO - Retrieved Images: ['http://localhost:8000/static/7.jpg']
+2025-03-08 16:41:36,091 - INFO - Retrieved Captions: ['No caption found']
+2025-03-08 16:41:36,091 - INFO - Querying Gemini
+2025-03-08 16:41:38,443 - INFO - LLM Response: The AI's response indicates it cannot answer the question "Where is this?" because there is no accompanying context (like an image or a description) to determine the location.  The AI needs more information.
+2025-03-08 16:41:38,443 - INFO - Request processed successfully
+2025-03-08 16:44:23,620 - INFO - Received request: file=image_0.jpg, query='where', session_id='default'
+2025-03-08 16:44:23,621 - INFO - Processing file: image_0.jpg
+2025-03-08 16:44:23,628 - INFO - Image verified successfully
+2025-03-08 16:44:23,629 - INFO - Generating query embedding
+2025-03-08 16:44:23,733 - INFO - Query embedding generated successfully
+2025-03-08 16:44:23,734 - INFO - Searching FAISS index
+2025-03-08 16:44:23,734 - INFO - FAISS search results: [('..\\database\\images\\8.jpg', 'No caption found')]
+2025-03-08 16:44:23,734 - INFO - Copying B:\Project\smartsightv3-o\backend\database\images\8.jpg to B:\Project\smartsightv3-o\backend\server\static\8.jpg
+2025-03-08 16:44:23,736 - INFO - Retrieved Images: ['http://localhost:8000/static/8.jpg']
+2025-03-08 16:44:23,736 - INFO - Retrieved Captions: ['No caption found']
+2025-03-08 16:44:23,737 - INFO - Querying Gemini
+2025-03-08 16:44:25,060 - INFO - LLM Response: The user's query "where" is incomplete and lacks context.  The AI's response "No caption found" suggests the user was likely looking for a location associated with some image or other media where a caption would normally provide that information.  Without more information, it's impossible to provide a more specific answer.
+2025-03-08 16:44:25,061 - INFO - Request processed successfully
+2025-03-08 16:54:34,530 - INFO - Received request: file=image_0.jpg, query='where is this', session_id='default'
+2025-03-08 16:54:34,530 - INFO - Processing file: image_0.jpg
+2025-03-08 16:54:34,545 - INFO - Image verified successfully
+2025-03-08 16:54:34,546 - INFO - Generating query embedding
+2025-03-08 16:54:35,026 - INFO - Query embedding generated successfully
+2025-03-08 16:54:35,026 - INFO - Searching FAISS index
+2025-03-08 16:54:35,026 - INFO - FAISS search results: [('..\\database\\images\\2.jpg', 'No caption found')]
+2025-03-08 16:54:35,026 - INFO - Copying B:\Project\smartsightv3-o\backend\database\images\2.jpg to B:\Project\smartsightv3-o\backend\server\static\2.jpg
+2025-03-08 16:54:35,026 - INFO - Retrieved Images: ['http://localhost:8000/static/2.jpg']
+2025-03-08 16:54:35,026 - INFO - Retrieved Captions: ['No caption found']
+2025-03-08 16:54:35,026 - INFO - Querying Gemini
+2025-03-08 16:54:36,436 - INFO - LLM Response: The AI's response indicates it can't answer "where is this" because there's no accompanying image or context (like a caption) to provide a location.  The user needs to provide more information, such as a picture, a description, or a reference.
+2025-03-08 16:54:36,436 - INFO - Request processed successfully
