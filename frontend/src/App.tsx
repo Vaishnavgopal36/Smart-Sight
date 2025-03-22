@@ -88,7 +88,18 @@ export default function App() {
           let responsePoints: string[] = [];
 
           try {
-            responsePoints = JSON.parse(cleanedResponse);
+            const parsedResponse = JSON.parse(cleanedResponse);
+
+            if (Array.isArray(parsedResponse)) {
+              responsePoints = parsedResponse; // ✅ If it's already an array, use it
+            } else if (
+              typeof parsedResponse === "object" &&
+              parsedResponse.response
+            ) {
+              responsePoints = [parsedResponse.response]; // ✅ Convert object into an array
+            } else {
+              responsePoints = ["Invalid response format."]; // ✅ Fallback
+            }
           } catch (error) {
             console.error("Error parsing AI response:", error);
             responsePoints = ["Could not parse AI response."];
@@ -169,7 +180,9 @@ export default function App() {
               setImage(null);
 
               try {
-                const response = await fetch(`${API_BASE_URL}/reset/`, { method: "POST" });
+                const response = await fetch(`${API_BASE_URL}/reset/`, {
+                  method: "POST",
+                });
                 const data = await response.json();
                 console.log(data.message);
               } catch (error) {

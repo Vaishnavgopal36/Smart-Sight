@@ -77,26 +77,30 @@ def get_joint_embedding(image: Image.Image, text: str):
     joint_embedding = (image_embedding + text_embedding) / 2
     return joint_embedding / np.linalg.norm(joint_embedding)
 
+
 def search_faiss(query_embedding, top_k=1):
-    """
-    Search the FAISS index for the top_k most similar images and retrieve their captions.
-    Args:
-        query_embedding (numpy.ndarray): The embedding to search with.
-        top_k (int): Number of top results to return (default is 1).
-    Returns:
-        list: A list of tuples containing (image_path, caption).
-    """
+    # Search the FAISS index for the top_k most similar images and retrieve their captions.
+    # Args:
+    #     query_embedding (numpy.ndarray): The embedding to search with.
+    #     top_k (int): Number of top results to return (default is 1).
+    # Returns:
+    #     list: A list of tuples containing (image_path, caption, similarity_score).
+
     distances, indices = index.search(query_embedding, top_k)
     results = []
-    for idx in indices[0]:
+    
+    for i, idx in enumerate(indices[0]):
+        if idx == -1:
+            continue
+        
         img_path = image_paths[idx]
-        img_filename = os.path.basename(img_path).lower()  # Extract and normalize filename
-        # Normalize .jpeg to .jpg for caption lookup
-        #if img_filename.endswith('.jpeg'):
-          #  img_filename = img_filename.replace('.jpeg', '.jpg')
-        logger.info(f"Looking up caption for {img_filename}")
-        caption = captions_dict.get(img_filename, "No caption found")
-        if caption == "No caption found":
-            logger.warning(f"No caption found for {img_filename}")
-        results.append((img_path, caption))
+        caption = captions_dict.get(os.path.basename(img_path).lower(), "No caption found")
+
+        distance = distances[0][i]
+        #similarity_score = 1 / (1 + distance)  # Converts L2 distance to similarity
+
+        logger.info(f"Image: {img_path}, Distance: {distance}, Similarity: {distance*100:.2f}%")
+
+        results.append((img_path, caption, distance))
+
     return results

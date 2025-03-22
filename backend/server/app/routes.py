@@ -68,117 +68,80 @@ async def upload_file(
 ):
     logger.info(f"Received request: file={file.filename if file else 'None'}, query='{query}', session_id='{session_id}'")
     try:
-        # Validate input
         if not file and not query:
-            logger.warning("No file or query provided")
             raise HTTPException(status_code=400, detail="Either a file or query must be provided.")
 
-        # Process image if provided
         image = None
         if file:
-            logger.info(f"Processing file: {file.filename}")
             image_bytes = await file.read()
             if not image_bytes:
-                logger.warning("Uploaded file is empty")
                 raise HTTPException(status_code=400, detail="Uploaded file is empty.")
             try:
                 image = Image.open(io.BytesIO(image_bytes))
                 image.verify()
                 image = Image.open(io.BytesIO(image_bytes))
-                logger.info("Image verified successfully")
-            except UnidentifiedImageError as e:
-                logger.error(f"Invalid image: {str(e)}")
+            except UnidentifiedImageError:
                 raise HTTPException(status_code=400, detail="Uploaded file is not a valid image.")
-            except Exception as e:
-                logger.error(f"Image processing error: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
 
-
-        # Define a global variable to store the last uploaded image
         global img
         if 'img' not in globals():
             img = None
 
-        # Generate query embedding
-        logger.info("Generating query embedding")
         query_embedding = None
-        try:
-            if file and query:
-                logger.info("Generating joint image-text embedding with new upload")
-                img = image
-                query_embedding = get_joint_embedding(img, query)
-            elif file:
-                logger.info("Generating image-only embedding")
-                img = image
-                query_embedding = get_image_embedding(img)
-            else:
-                logger.info("Generating embedding with text and last uploaded image if available")
-                if img is not None and query:
-                    query_embedding = get_joint_embedding(img, query)
-                elif query:
-                    query_embedding = get_text_embedding(query)
-                else:
-                    raise ValueError("No valid input provided for embedding")
-        except ValueError as e:
-            logger.error(f"ValueError in embedding generation: {str(e)}")
-            raise HTTPException(status_code=400, detail=f"Invalid input for embedding: {str(e)}")
-        except Exception as e:
-            logger.error(f"Embedding generation error: {str(e)}", exc_info=True)
-            raise HTTPException(status_code=500, detail=f"Embedding generation failed: {str(e)}")
+        if file and query:
+            img = image
+            query_embedding = get_joint_embedding(img, query)
+        elif file:
+            img = image
+            query_embedding = get_image_embedding(img)
+        elif query:
+            query_embedding = get_joint_embedding(img, query) if img else get_text_embedding(query)
+        else:
+            raise ValueError("No valid input for embedding")
 
-
-        # Search FAISS index
         logger.info("Searching FAISS index")
         try:
-            results = search_faiss(query_embedding, top_k=1)
-            print(results)
+            results = search_faiss(query_embedding, top_k=1)  # Increase k if needed
             if not results:
-                logger.warning("No similar images found")
                 raise HTTPException(status_code=404, detail="No similar images found.")
-            logger.info(f"FAISS search results: {results}")
         except Exception as e:
-            logger.error(f"FAISS search error: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"FAISS search failed: {str(e)}")
 
-        # Copy files and prepare results
         retrieved_images = []
         retrieved_captions = []
-        for img_path, caption in results:
-            img_filename = os.path.basename(img_path)  # Extract filename only
-            static_img_path = os.path.join(STATIC_DIR, img_filename)
-            # Convert relative path from .paths to absolute path
-            abs_img_path = os.path.normpath(os.path.join(BASE_IMAGE_DIR, img_filename))
-            try:
-                logger.info(f"Copying {abs_img_path} to {static_img_path}")
-                shutil.copy(abs_img_path, static_img_path)
-            except FileNotFoundError as e:
-                logger.warning(f"Image file {abs_img_path} not found: {str(e)}")
-                continue
-            except Exception as e:
-                logger.error(f"File copy error: {str(e)}", exc_info=True)
-                continue
+        similarity_percentages = []
+        is_image_found = False
 
-            retrieved_images.append(f"{API_BASE_URL}/static/{img_filename}")
-            retrieved_captions.append(caption)
+        for img_path, caption, similarity in results:  # Assuming (image_path, caption, similarity_score)
+            similarity_percentage = round(similarity * 100, 2)
+            similarity_percentages.append(similarity_percentage)
+            logger.info(f"Similarity Score: {similarity_percentage}% for image {img_path} and caption {caption}")  # Logs similarity score
+            
+            if similarity_percentage > 50:
+                is_image_found = True
+                img_filename = os.path.basename(img_path)
+                static_img_path = os.path.join(STATIC_DIR, img_filename)
+                abs_img_path = os.path.normpath(os.path.join(BASE_IMAGE_DIR, img_filename))
+                
+                try:
+                    shutil.copy(abs_img_path, static_img_path)
+                except FileNotFoundError:
+                    continue
+                
+                retrieved_images.append(f"{API_BASE_URL}/static/{img_filename}")
+                retrieved_captions.append(caption)
 
-        logger.info(f"Retrieved Images: {retrieved_images}")
-        logger.info(f"Retrieved Captions: {retrieved_captions}")
+        if not is_image_found:
+            retrieved_captions = None
 
-        # Query Gemini
-        logger.info("Querying Gemini")
-        try:
-            llm_response = query_gemini(query, retrieved_captions, session_id)
-            logger.info(f"LLM Response: {llm_response}")
-        except Exception as e:
-            logger.error(f"Gemini query error: {str(e)}", exc_info=True)
-            raise HTTPException(status_code=500, detail=f"Gemini query failed: {str(e)}")
+        llm_response = query_gemini(query, retrieved_captions, session_id)
 
-        # Return full response
-        logger.info("Request processed successfully")
         return JSONResponse(content={
             "message": "Request processed successfully!",
             "similar_images": retrieved_images,
             "retrieved_captions": retrieved_captions,
+            "similarity_scores": similarity_percentages,
+            "is_image_found": is_image_found,
             "llm_response": llm_response,
             "session_id": session_id
         })
