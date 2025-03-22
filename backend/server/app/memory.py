@@ -9,6 +9,7 @@ os.environ["GOOGLE_API_KEY"] = GEMINI_API_KEY
 session_memory = defaultdict(list)
 # Query Gemini AI
 def query_gemini(user_query, image_descriptions, session_id):
+
     # Initialize session memory if not present
     if session_id not in session_memory:
         session_memory[session_id] = []
@@ -62,3 +63,8 @@ def query_gemini(user_query, image_descriptions, session_id):
         return response.content if response else ["No relevant insights available."]
     except:
         return ["An error occurred while generating the response."]
+
+def reset_memory():
+    global session_memory
+    session_memory.clear()
+    print("✅ Session memory reset successfully.")

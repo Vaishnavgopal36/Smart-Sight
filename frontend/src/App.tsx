@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 import "./App.css";
 import { CONFIG } from "./config";
 
@@ -59,7 +60,7 @@ export default function App() {
 
       try {
         const response = await axios.post(
-          "http://localhost:8000/upload/",
+          `${API_BASE_URL}/upload/`, // ✅ Dynamic backend URL
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -162,10 +163,18 @@ export default function App() {
           {/* New Chat Button */}
           <Button
             variant="outline"
-            onClick={() => {
+            onClick={async () => {
               setMessages([]);
               setInput("");
               setImage(null);
+
+              try {
+                const response = await fetch(`${API_BASE_URL}/reset/`, { method: "POST" });
+                const data = await response.json();
+                console.log(data.message);
+              } catch (error) {
+                console.error("Error resetting backend:", error);
+              }
             }}
             className="flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition"
           >
@@ -191,8 +200,7 @@ export default function App() {
       {/* Chat Area */}
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-[calc(100vh-120px)]">
-
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-[calc(100vh-120px)]">
             {messages.map((msg, index) => (
               <motion.div
                 key={index}
@@ -275,12 +283,12 @@ export default function App() {
 
           {/* Input Area */}
           <div className="p-4 bg-background flex flex-wrap items-center gap-2">
-
             {/* Image Upload */}
             <Button
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition">
+              className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition"
+            >
               <Upload className="h-5 w-5 mr-2 text-gray-400" />
               Upload
             </Button>

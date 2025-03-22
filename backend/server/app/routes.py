@@ -1,4 +1,5 @@
 # backend/server/app/routes.py
+from settings import API_BASE_URL  # Import API_BASE_URL
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 import io
@@ -32,6 +33,34 @@ BASE_IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "
 async def test_endpoint():
     logger.info("Test endpoint called")
     return {"message": "Test successful"}
+
+@router.post("/reset/")
+async def reset_backend():
+    from memory import reset_memory
+    import shutil
+
+    # Reset session memory
+    reset_memory()
+
+    # Reset retrieved images and captions
+    global retrieved_images, retrieved_captions, img
+    retrieved_images = []
+    retrieved_captions = []
+    img = None
+
+    # Clear static folder
+    try:
+        for filename in os.listdir(STATIC_DIR):
+            file_path = os.path.join(STATIC_DIR, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        print("✅ Static folder cleared successfully.")
+    except Exception as e:
+        return {"message": f"Error clearing static folder: {str(e)}"}
+
+    print("✅ Retrieved images, captions, and last uploaded image reset successfully.")
+    return {"message": "Backend reset successfully!"}
+
 
 @router.post("/upload/")
 async def upload_file(
@@ -129,7 +158,7 @@ async def upload_file(
                 logger.error(f"File copy error: {str(e)}", exc_info=True)
                 continue
 
-            retrieved_images.append(f"http://localhost:8000/static/{img_filename}")
+            retrieved_images.append(f"{API_BASE_URL}/static/{img_filename}")
             retrieved_captions.append(caption)
 
         logger.info(f"Retrieved Images: {retrieved_images}")
