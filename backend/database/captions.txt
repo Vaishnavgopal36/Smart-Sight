@@ -126,7 +126,7 @@
 143.jpg,Dzukou Valley, Nagaland – Valley of flowers with rolling green hills and breathtaking trekking trails.
 144.jpg,Nubra Valley, Ladakh – Cold desert with sand dunes, double-humped camels, and surreal landscapes.
 145.jpeg,Cherrapunji, Meghalaya – Famous for living root bridges, waterfalls, and lush greenery.
-146.jpeg,Hemis, Ladakh – Known for Hemis Monastery and the vibrant Hemis Festival featuring masked dances.
+146.jpg,Hemis, Ladakh – Known for Hemis Monastery and the vibrant Hemis Festival featuring masked dances.
 147.jpg,Ponmudi, Kerala – A hidden hill station with misty peaks, tea plantations, and winding trails.
 148.jpg,Malana village, Himachal Pradesh – A remote village known for its distinct culture and scenic beauty.
 149.jpg,Gokarna, Karnataka – A spiritual and beach destination with pristine shores and Shiva temples.
