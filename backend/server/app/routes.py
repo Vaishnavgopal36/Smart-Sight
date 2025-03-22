@@ -145,7 +145,7 @@ async def upload_file(
             "message": "Request processed successfully!",
             "similar_images": retrieved_images,
             "retrieved_captions": retrieved_captions,
-            "similarity_scores": similarity_percentages,
+            "similarity_scores": [float(score) for score in similarity_percentages],
             "is_image_found": is_image_found,
             "llm_response": llm_response,
             "session_id": session_id
