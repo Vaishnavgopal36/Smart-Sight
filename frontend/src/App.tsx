@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import "./App.css";
+import { CONFIG } from "./config";
 
 interface Message {
   text: string | string[];
@@ -148,7 +149,8 @@ export default function App() {
           >
             <Menu className="h-5 w-5 text-[var(--muted)]" />
           </Button> */}
-          <span>SmartSight</span>
+          <img src={CONFIG.logoURL} alt="Logo" className="h-8 rounded-lg" />
+          <span>{CONFIG.siteTitle}</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
