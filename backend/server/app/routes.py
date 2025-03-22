@@ -103,7 +103,7 @@ async def upload_file(
 
         logger.info("Searching FAISS index")
         try:
-            results = search_faiss(query_embedding, top_k=10)  # Increase k if needed
+            results = search_faiss(query_embedding, top_k=5)  # Increase k if needed
             if not results:
                 raise HTTPException(status_code=404, detail="No similar images found.")
         except Exception as e:
