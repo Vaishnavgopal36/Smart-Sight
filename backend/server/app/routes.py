@@ -43,9 +43,11 @@ async def reset_backend():
     reset_memory()
 
     # Reset retrieved images and captions
-    global retrieved_images, retrieved_captions, img
+    global retrieved_images, retrieved_captions, img,similarity_percentages,is_image_found
     retrieved_images = []
     retrieved_captions = []
+    similarity_percentages = []
+    is_image_found = False
     img = None
 
     # Clear static folder
@@ -101,12 +103,11 @@ async def upload_file(
 
         logger.info("Searching FAISS index")
         try:
-            results = search_faiss(query_embedding, top_k=1)  # Increase k if needed
+            results = search_faiss(query_embedding, top_k=10)  # Increase k if needed
             if not results:
                 raise HTTPException(status_code=404, detail="No similar images found.")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"FAISS search failed: {str(e)}")
-
         retrieved_images = []
         retrieved_captions = []
         similarity_percentages = []
@@ -133,8 +134,12 @@ async def upload_file(
 
         if not is_image_found:
             retrieved_captions = None
+        # else:
+        #     max_index = similarity_percentages.index(max(similarity_percentages))  # Find the most similar image
+        #     retrieved_captions = retrieved_captions[max_index]  # Get only the most similar caption
 
-        llm_response = query_gemini(query, retrieved_captions, session_id)
+        llm_response = query_gemini(query, retrieved_captions[0] if retrieved_captions else None, session_id)
+
 
         return JSONResponse(content={
             "message": "Request processed successfully!",
