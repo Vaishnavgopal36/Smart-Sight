@@ -363,7 +363,7 @@ export default function App() {
                   handleSend();
                 }
               }}
-              placeholder="Type a message..."
+              placeholder="Let's find out..."
               className="flex-1 bg-[var(--background)] text-[var(--foreground)] border border-[var(--muted)] rounded-lg px-3 py-2"
             />
 
