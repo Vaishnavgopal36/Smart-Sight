@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, Send, RefreshCw, Sun, Moon } from "lucide-react";
+import {
+  Upload,
+  Send,
+  RefreshCw,
+  Sun,
+  Moon,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +30,7 @@ export default function App() {
   const [backendStatus, setBackendStatus] = useState<string>("Idle");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const [expandedImages, setExpandedImages] = useState<number | null>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -251,21 +260,47 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Display Retrieved Images with Captions */}
+                {/* Expandable Retrieved Images Section */}
                 {msg.images && msg.images.length > 0 && (
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    {msg.images.map((img, imgIndex) => (
-                      <div key={imgIndex} className="text-center">
-                        <img
-                          src={img.url}
-                          alt="Retrieved"
-                          className="w-32 h-32 rounded-md mx-auto"
-                        />
-                        <p className="text-xs text-gray-400 mt-1">
-                          {img.caption}
-                        </p>
+                  <div className="mt-3">
+                    <button
+                      onClick={() =>
+                        setExpandedImages(
+                          expandedImages === index ? null : index
+                        )
+                      }
+                      className="flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-md transition-all duration-200 
+             bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--card)]"
+                    >
+                      {expandedImages === index ? (
+                        <>
+                          <ChevronUp className="w-4 h-4 text-[var(--foreground)]" />
+                          Hide
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4 text-[var(--foreground)]" />
+                          See My Brain
+                        </>
+                      )}
+                    </button>
+
+                    {expandedImages === index && (
+                      <div className="grid grid-cols-2 gap-3 mt-2 p-2 bg-[var(--card)] rounded-lg shadow-md">
+                        {msg.images.map((img, imgIndex) => (
+                          <div key={imgIndex} className="text-center">
+                            <img
+                              src={img.url}
+                              alt="Retrieved"
+                              className="w-32 h-32 rounded-md mx-auto border border-[var(--muted)]"
+                            />
+                            <p className="text-xs text-[var(--foreground)] opacity-80 mt-1">
+                              {img.caption}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
               </motion.div>
