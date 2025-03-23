@@ -225,13 +225,16 @@ export default function App() {
           <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-[calc(100vh-120px)]">
             {messages.map((msg, index) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-3 rounded-lg border bg-[var(--card)] shadow-xl"
-              >
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-3 rounded-lg border shadow-xl ${
+                index % 2 === 0 ? "bg-[var(--sender)]" : "bg-[var(--response)]"
+              }`}
+            >
+            
                 {Array.isArray(msg.text) ? (
-                  <ul className="list-disc list-inside text-sm text-foreground">
+                  <ul className="list-disc list-inside  text-sm text-foreground ">
                     {msg.text.length > 0 ? (
                       msg.text.map((point, index) => (
                         <li key={index}>{point}</li>

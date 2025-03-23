@@ -1,13 +1,17 @@
 :root {
   --bg-dark: #121212;
   --text-dark: #e0e0e0;
-  --card-dark: #1e1e1e;
+  --card-dark: #434851;
   --muted-dark: #3a3a3a; /* Increase contrast */
+  --response-dark: #262a2f; /* Slightly lighter than card for responses */
+  --sender-dark: #181818; /* Slightly darker than card for sender */
 
   --bg-light: #ffffff;
   --text-light: #000000;
-  --card-light: #f5f5f5;
+  --card-light: #c4c8cb;
   --muted-light: #d0d0d0; /* Lighter muted color for visibility */
+  --response-light: #d8dbdf; /* Slightly darker than card for responses */
+  --sender-light: #c1bfbf; /* Keep sender box white */
 }
 
 .dark {
@@ -15,6 +19,8 @@
   --foreground: var(--text-dark);
   --card: var(--card-dark);
   --muted: var(--muted-dark);
+  --response: var(--response-dark);
+  --sender: var(--sender-dark);
 }
 
 .light {
@@ -22,7 +28,10 @@
   --foreground: var(--text-light);
   --card: var(--card-light);
   --muted: var(--muted-light);
+  --response: var(--response-light);
+  --sender: var(--sender-light);
 }
+
 
 
 /* Ensure smooth transitions */
