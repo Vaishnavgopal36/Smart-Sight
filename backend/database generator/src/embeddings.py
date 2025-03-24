@@ -2,10 +2,10 @@ import torch
 import numpy as np
 from src.model_loader import load_model
 from src.preprocess import preprocess_image, tokenize_text
-from config import DEVICE
 
-# Load the model
-model, _ = load_model()
+# Load the model only once and keep preprocess
+model, preprocess = load_model()  # ✅ Keeps preprocess for reuse
+
 
 def generate_image_embedding(image_path):
     """
@@ -17,7 +17,7 @@ def generate_image_embedding(image_path):
     Returns:
         np.ndarray: Normalized image embedding.
     """
-    image_tensor = preprocess_image(image_path)
+    image_tensor = preprocess_image(image_path, preprocess)  # ✅ Pass preprocess function
     if image_tensor is None:
         return None
 

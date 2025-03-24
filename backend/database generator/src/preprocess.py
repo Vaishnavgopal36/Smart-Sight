@@ -2,17 +2,14 @@ from PIL import Image
 import torch
 import clip
 from config import DEVICE
-from src.model_loader import load_model
 
-# Load the model (to get the preprocessing function)
-_, preprocess = load_model()
-
-def preprocess_image(image_path):
+def preprocess_image(image_path, preprocess):
     """
     Loads and preprocesses an image for CLIP.
 
     Args:
         image_path (str): Path to the image file.
+        preprocess (function): CLIP's preprocessing function.
 
     Returns:
         torch.Tensor: Preprocessed image tensor.
