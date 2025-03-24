@@ -15,3 +15,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Base API URL (set dynamically or use default)
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+
+def ensure_static_folder():
+    """Ensure the static folder exists before use."""
+    if not os.path.exists(STATIC_DIR):
+        os.makedirs(STATIC_DIR)
+        print(f"✅ Created missing static folder at: {STATIC_DIR}")
