@@ -86,7 +86,7 @@ def search_faiss(query_embedding, top_k=1):
     # Returns:
     #     list: A list of tuples containing (image_path, caption, similarity_score).
 
-    distances, indices = index.search(query_embedding, top_k)
+    similarity_scores, indices = index.search(query_embedding, top_k)
     results = []
     
     for i, idx in enumerate(indices[0]):
@@ -96,11 +96,12 @@ def search_faiss(query_embedding, top_k=1):
         img_path = image_paths[idx]
         caption = captions_dict.get(os.path.basename(img_path).lower(), "No caption found")
 
-        distance = distances[0][i]
-        #similarity_score = 1 / (1 + distance)  # Converts L2 distance to similarity
+        similarity_score = similarity_scores[0][i]
+        # similarity_score = 1 / (1 + similarity_score)  # Converts L2 distance to similarity if needed
 
-        logger.info(f"Image: {img_path}, Distance: {distance}, Similarity: {distance*100:.2f}%")
+        logger.info(f"Image: {img_path}, Similarity: {similarity_score*100:.2f}%")
 
-        results.append((img_path, caption, distance))
+        results.append((img_path, caption, similarity_score))
 
     return results
+
