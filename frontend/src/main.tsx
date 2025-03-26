@@ -1,13 +1,20 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import App from "./App.tsx";
+import "./index.css";
+import SmartSightHome from "./SmartSightHome";
+import App from "./App";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider attribute="class" defaultTheme="dark">
-      <App />
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider attribute="class" defaultTheme="dark">
+        <Routes>
+          <Route path="/" element={<SmartSightHome />} /> {/* Load SmartSightHome initially */}
+          <Route path="/app" element={<App />} /> {/* Navigate to App.tsx when button is clicked */}
+        </Routes>
+      </ThemeProvider>
+    </BrowserRouter>
   </StrictMode>
 );
