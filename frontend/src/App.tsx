@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Camera } from "lucide-react";
+
 import {
   Upload,
   Send,
@@ -19,7 +21,7 @@ import { CONFIG } from "./config";
 
 interface Message {
   text: string | string[];
-  inputImages?: string[]; // Change from inputImage to inputImages
+  inputImages?: string[];
   images?: { url: string; caption: string }[];
 }
 
@@ -31,6 +33,62 @@ export default function App() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const [expandedImages, setExpandedImages] = useState<number | null>(null);
+  const [useCamera, setUseCamera] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (useCamera) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
+        .catch((err) => {
+          console.error("Error accessing the camera", err);
+          alert(
+            "Could not access the camera. Please check your permissions and try again."
+          );
+          setUseCamera(false);
+        });
+    } else {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+    }
+  }, [useCamera]);
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext("2d");
+      if (context) {
+        canvasRef.current.width = videoRef.current.videoWidth;
+        canvasRef.current.height = videoRef.current.videoHeight;
+        context.drawImage(
+          videoRef.current,
+          0,
+          0,
+          canvasRef.current.width,
+          canvasRef.current.height
+        );
+        const dataUrl = canvasRef.current.toDataURL("image/jpeg");
+        setImage((prev) => [...(prev || []), dataUrl]);
+      }
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,13 +98,13 @@ export default function App() {
     if (input || (image && image.length > 0)) {
       const newMessage: Message = {
         text: input,
-        inputImages: image || [], // Store multiple images in the message
+        inputImages: image || [],
         images: [],
       };
 
-      setMessages((prev) => [...prev, newMessage]); // Save to chat
+      setMessages((prev) => [...prev, newMessage]);
       setInput("");
-      setImage(null); // Reset image state
+      setImage(null);
       setBackendStatus("Processing...");
 
       const formData = new FormData();
@@ -68,13 +126,9 @@ export default function App() {
       }
 
       try {
-        const response = await axios.post(
-          `${API_BASE_URL}/upload/`, // ✅ Dynamic backend URL
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+        const response = await axios.post(`${API_BASE_URL}/upload/`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
         console.log("Response:", response.data);
 
@@ -90,9 +144,7 @@ export default function App() {
           );
 
           const rawResponse = response.data.llm_response;
-          const cleanedResponse = rawResponse
-            .replace(/```json|```/g, "")
-            .trim();
+          const cleanedResponse = rawResponse.replace(/```json|```/g, "").trim();
 
           let responsePoints: string[] = [];
 
@@ -100,14 +152,14 @@ export default function App() {
             const parsedResponse = JSON.parse(cleanedResponse);
 
             if (Array.isArray(parsedResponse)) {
-              responsePoints = parsedResponse; // ✅ If it's already an array, use it
+              responsePoints = parsedResponse;
             } else if (
               typeof parsedResponse === "object" &&
               parsedResponse.response
             ) {
-              responsePoints = [parsedResponse.response]; // ✅ Convert object into an array
+              responsePoints = [parsedResponse.response];
             } else {
-              responsePoints = ["Invalid response format."]; // ✅ Fallback
+              responsePoints = ["Invalid response format."];
             }
           } catch (error) {
             console.error("Error parsing AI response:", error);
@@ -143,12 +195,13 @@ export default function App() {
       };
 
       Promise.all(Array.from(files).map(readFile)).then((imageUrls) => {
-        setImage((prev) => [...(prev || []), ...imageUrls]); // ✅ Store multiple images at once
+        setImage((prev) => [...(prev || []), ...imageUrls]);
       });
 
-      e.target.value = ""; // Reset input to allow selecting the same images again
+      e.target.value = "";
     }
   };
+
   const handleRemoveImage = (index: number) => {
     setImage((prev) => prev?.filter((_, i) => i !== index) || []);
   };
@@ -164,23 +217,15 @@ export default function App() {
       {/* Header */}
       <header className="text-xl font-bold p-4 bg-[var(--background)] shadow-md flex flex-wrap items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
-          {/* <Button
-            variant="ghost"
-            className="hover:bg-[var(--muted)]/30 active:scale-95 transition"
-          >
-            <Menu className="h-5 w-5 text-[var(--muted)]" />
-          </Button> */}
           <img src={CONFIG.logoURL} alt="Logo" className="h-8 rounded-lg" />
           <span>{CONFIG.siteTitle}</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-          {/* Backend Status */}
           <div className="text-sm px-4 py-1 rounded-lg bg-[var(--card)]">
             Backend Status: {backendStatus}
           </div>
 
-          {/* New Chat Button */}
           <Button
             variant="outline"
             onClick={async () => {
@@ -203,7 +248,6 @@ export default function App() {
             <RefreshCw className="h-4 w-4 text-gray-400" /> New Chat
           </Button>
 
-          {/* Theme Toggle Button */}
           <Button
             variant="outline"
             onClick={toggleTheme}
@@ -225,20 +269,17 @@ export default function App() {
           <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-[calc(100vh-120px)]">
             {messages.map((msg, index) => (
               <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`p-3 rounded-lg border shadow-xl ${
-                index % 2 === 0 ? "bg-[var(--sender)]" : "bg-[var(--response)]"
-              }`}
-            >
-            
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-3 rounded-lg border shadow-xl ${
+                  index % 2 === 0 ? "bg-[var(--sender)]" : "bg-[var(--response)]"
+                }`}
+              >
                 {Array.isArray(msg.text) ? (
-                  <ul className="list-disc list-inside  text-sm text-foreground ">
+                  <ul className="list-disc list-inside text-sm text-foreground">
                     {msg.text.length > 0 ? (
-                      msg.text.map((point, index) => (
-                        <li key={index}>{point}</li>
-                      ))
+                      msg.text.map((point, index) => <li key={index}>{point}</li>)
                     ) : (
                       <li>No relevant insights available.</li>
                     )}
@@ -247,7 +288,6 @@ export default function App() {
                   <p className="text-sm text-foreground">{msg.text}</p>
                 )}
 
-                {/* Display Uploaded Images */}
                 {msg.inputImages && msg.inputImages.length > 0 && (
                   <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {msg.inputImages.map((img, imgIndex) => (
@@ -263,14 +303,11 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Expandable Retrieved Images Section */}
                 {msg.images && msg.images.length > 0 && (
                   <div className="mt-3">
                     <button
                       onClick={() =>
-                        setExpandedImages(
-                          expandedImages === index ? null : index
-                        )
+                        setExpandedImages(expandedImages === index ? null : index)
                       }
                       className="flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-md transition-all duration-200 
              bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--card)]"
@@ -310,70 +347,115 @@ export default function App() {
             ))}
             <div ref={chatEndRef} />
           </div>
-          {/* Image Preview Section */}
-          {image && image.length > 0 && (
-            <div className="flex gap-2 p-2">
-              {image.map((img, index) => (
-                <div key={index} className="relative w-16 h-16">
-                  <img
-                    src={img}
-                    alt={`Uploaded ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg border border-gray-500"
-                  />
-                  {/* Remove Button */}
-                  <button
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute top-0 right-0 bg-black bg-opacity-50 text-white rounded-full p-1 text-xs hover:bg-opacity-70 active:scale-90 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Input Area */}
-          <div className="p-4 bg-background flex flex-wrap items-center gap-2">
-            {/* Image Upload */}
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition"
-            >
-              <Upload className="h-5 w-5 mr-2 text-gray-400" />
-              Upload
-            </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              multiple // ✅ Allows selecting multiple images at once
-              hidden
-              onChange={handleFileUpload}
-            />
+          <div className="p-4 bg-background flex flex-col gap-4">
+            {/* Camera Section */}
+            {useCamera && (
+              <div className="flex flex-col items-start gap-2">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  className="rounded-xl w-full max-w-xs"
+                />
+                <div className="flex gap-2 w-full max-w-xs">
+                  <Button
+                    onClick={captureImage}
+                    className="bg-white text-black border border-gray-300 hover:bg-gray-100 flex-1"
+                  >
+                    Capture
+                  </Button>
+                  <Button
+                    onClick={() => setUseCamera(false)}
+                    className="bg-red-500 hover:bg-red-600 flex-1"
+                  >
+                    Close
+                  </Button>
+                </div>
+                <canvas ref={canvasRef} style={{ display: "none" }} />
+              </div>
+            )}
 
-            {/* Text Input */}
-            <Input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Let's find out..."
-              className="flex-1 bg-[var(--background)] text-[var(--foreground)] border border-[var(--muted)] rounded-lg px-3 py-2"
-            />
+            {/* Combined Image Preview Section */}
+            {image && image.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-2">
+                {image.map((img, index) => (
+                  <div key={index} className="relative w-16 h-16">
+                    <img
+                      src={img}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg border border-gray-500"
+                    />
+                    {/* Remove Button */}
+                    <button
+                      onClick={() => handleRemoveImage(index)}
+                      className="absolute top-0 right-0 bg-black bg-opacity-50 text-white rounded-full p-1 text-xs hover:bg-opacity-70 active:scale-90 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
-            {/* Send Button */}
-            <Button
-              onClick={handleSend}
-              className="text-[var(--muted)] hover:bg-[var(--muted)]/30 active:scale-95 transition"
-            >
-              <Send className="h-5 w-5 text-gray-400" />
-            </Button>
+            {/* Buttons and Input Row */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Image Upload */}
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition"
+              >
+                <Upload className="h-5 w-5 text-gray-400" />
+              </Button>
+
+              {/* Camera Toggle/Capture */}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (useCamera) {
+                    captureImage(); // Capture image if camera is already open
+                  } else {
+                    setUseCamera(true); // Open camera if it's not already open
+                  }
+                }}
+                className="px-4 py-2 text-sm flex items-center gap-2 hover:bg-[var(--muted)] active:scale-95 transition"
+              >
+                <Camera className="h-5 w-5 text-gray-400" />
+              </Button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                multiple
+                hidden
+                onChange={handleFileUpload}
+              />
+
+              {/* Text Input */}
+              <Input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Let's find out..."
+                className="flex-1 bg-[var(--background)] text-[var(--foreground)] border border-[var(--muted)] rounded-lg px-3 py-2"
+              />
+
+              {/* Send Button */}
+              <Button
+                onClick={handleSend}
+                className="text-[var(--muted)] hover:bg-[var(--muted)]/30 active:scale-95 transition"
+              >
+                <Send className="h-5 w-5 text-gray-400" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
