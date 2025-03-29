@@ -63,19 +63,31 @@ def get_text_embedding(text: str):
         embedding = model.encode_text(text_tokenized).cpu().numpy()
     return embedding / np.linalg.norm(embedding)
 
-def get_joint_embedding(image: Image.Image, text: str):
+import numpy as np
+from PIL import Image
+
+def get_joint_embedding(image: Image.Image, text: str, alpha: float = 0.5):
     """
-    Generate a joint embedding by averaging the image and text embeddings.
+    Generate a weighted joint embedding of the image and text.
+
     Args:
         image (PIL.Image.Image): The input image.
         text (str): The input text.
+        alpha (float): Weight for image embedding (0 to 1). 
+                       The text embedding weight is (1 - alpha).
+
     Returns:
-        numpy.ndarray: Normalized joint embedding.
+        numpy.ndarray: Normalized weighted joint embedding.
     """
     image_embedding = get_image_embedding(image)
     text_embedding = get_text_embedding(text)
-    joint_embedding = (image_embedding + text_embedding) / 2
+
+    # Weighted combination
+    joint_embedding = alpha * image_embedding + (1 - alpha) * text_embedding
+
+    # Normalize
     return joint_embedding / np.linalg.norm(joint_embedding)
+
 
 
 def search_faiss(query_embedding, top_k=1):
