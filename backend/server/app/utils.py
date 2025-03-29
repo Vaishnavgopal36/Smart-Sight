@@ -27,7 +27,7 @@ def load_captions():
                 if len(parts) == 2:
                     key = parts[0].strip().lower()  # Normalize to lowercase
                     captions_dict[key] = parts[1].strip()
-                    logger.info(f"Loaded caption for {key}")
+                    #logger.info(f"Loaded caption for {key}")
         logger.info(f"Loaded {len(captions_dict)} captions from {CAPTIONS_FILE_PATH}")
     except FileNotFoundError:
         logger.error(f"Captions file not found at {CAPTIONS_FILE_PATH}")
