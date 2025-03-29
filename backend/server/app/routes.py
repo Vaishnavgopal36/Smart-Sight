@@ -74,6 +74,9 @@ async def upload_file(
             raise HTTPException(status_code=400, detail="Either a file or query must be provided.")
 
         image = None
+
+        alpha = 0.6 #weight of image in joint embedding
+
         if file:
             image_bytes = await file.read()
             if not image_bytes:
@@ -92,12 +95,12 @@ async def upload_file(
         query_embedding = None
         if file and query:
             img = image
-            query_embedding = get_joint_embedding(img, query)
+            query_embedding = get_joint_embedding(img, query,alpha)
         elif file:
             img = image
             query_embedding = get_image_embedding(img)
         elif query:
-            query_embedding = get_joint_embedding(img, query) if img else get_text_embedding(query)
+            query_embedding = get_joint_embedding(img, query,alpha) if img else get_text_embedding(query)
         else:
             raise ValueError("No valid input for embedding")
 
