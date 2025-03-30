@@ -163,7 +163,7 @@ export default function App() {
             }
           } catch (error) {
             console.error("Error parsing AI response:", error);
-            responsePoints = ["Could not parse AI response."];
+            responsePoints = ["No internet connection."];
           }
 
           setMessages((prev) => [
